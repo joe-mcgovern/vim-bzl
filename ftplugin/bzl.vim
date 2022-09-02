@@ -1,37 +1,28 @@
 vim9script
 
-if exists("g:has_loaded_bzl")
-  finish
-endif
-
-g:has_loaded_bzl = 1
-
-command! -nargs=0 BazelTestCurrent :call BazelTestCurrent()
-command! -nargs=0 BazelBuildCurrent :call BazelBuildCurrent()
+command! -nargs=0 BazelTestCurrent :call BazelActionAgainstTargetUnderCursor("test")
+command! -nargs=0 BazelBuildCurrent :call BazelActionAgainstTargetUnderCursor("build")
+command! -nargs=0 BazelRunCurrent :call BazelActionAgainstTargetUnderCursor("run")
+command! -nargs=1 BazelCurrent :call BazelActionAgainstTargetUnderCursor(<f-args>)
 nnoremap <buffer> <leader>bt :BazelTestCurrent<cr>
 nnoremap <buffer> <leader>bb :BazelBuildCurrent<cr>
+nnoremap <buffer> <leader>br :BazelBuildCurrent<cr>
 
-# * Check if dispatch is installed before using it
-# * Add BazelRunCurrent
-# * This should be robustified so that tests can be run from within a go file.
-def BazelTestCurrent()
+# * TODO: Check if dispatch is installed before using it
+# * TODO: This should be robustified so that tests can be run from within a go file.
+# Something like: Bazel test :go_default_library
+# * TODO: Write function for getting nearest bazel file (current dir or above)
+# * TODO: Write command that supports auto-completion for bzl target from
+# within file
+# * TODO: Write help doc
+# * TODO: write readme
+def BazelActionAgainstTargetUnderCursor(bzl_cmd: string)
   const bzl_target = GetNameOfTargetUnderCursor()
   if bzl_target ==# ""
     echom "ERROR: Could not find bazel target"
   endif
   const path = PathFromProjectRoot()
-  execute ":Start -wait=always bazel test /" .. path .. ":" .. bzl_target
-  call setpos(".", save_pos)
-enddef
-
-def BazelBuildCurrent()
-  const bzl_target = GetNameOfTargetUnderCursor()
-  if bzl_target ==# ""
-    echom "ERROR: Could not find bazel target"
-  endif
-  const path = PathFromProjectRoot()
-  echom ":Start -wait=always bazel build /" .. path .. ":" .. bzl_target
-  execute ":Start -wait=always bazel build /" .. path .. ":" .. bzl_target
+  execute ":Start -wait=always bazel " .. bzl_cmd .. " /" .. path .. ":" .. bzl_target
 enddef
 
 def GetNameOfTargetUnderCursor(): string
@@ -50,7 +41,6 @@ def GetNameOfTargetUnderCursor(): string
   # index + 1. So, using -2 to remove get the correct indexing and then
   # remove the right quote
   const bzl_target = line[start_pos + 1 : end_pos - 2]
-  echom "Got bazel target: " .. bzl_target
   setpos(".", save_pos)
   return bzl_target
 enddef
