@@ -7,7 +7,7 @@ export def ExecuteCommand(command: string, path: string, target: string)
 enddef
 
 export def BufferTestTarget(default: string): string
-  return get(b: "bzl_test_target", default)
+  return get(b:, "bzl_test_target", default)
 enddef
 
 export def ConvertAbsPathToBzlPath(path: string): string
@@ -35,7 +35,7 @@ def PathToProjectRoot(): string
   return ""
 enddef
 
-export def NearestDirWithBzlFile(): string
+export def NearestDirWithBzlFile(withNamedRule = ''): string
   const currDir = expand("%:p:h")
   const parts = split(currDir, "/")
   const home = getenv("HOME")
@@ -46,10 +46,20 @@ export def NearestDirWithBzlFile(): string
     if pathSubset ==# home
       break
     endif
-    if filereadable(pathSubset .. "/BUILD.bazel")
+    const path = pathSubset .. "/BUILD.bazel"
+    if filereadable(path) && ContainsRule(path, withNamedRule)
       return pathSubset
     endif
     currentIndex -= 1
   endwhile
   return ""
+enddef
+
+def ContainsRule(path: string, rule: string): bool
+  if len(rule) == 0
+    return true
+  endif
+  const lines = readfile(path)
+  const index = match(lines, '^\s*name = "' .. rule .. '"')
+  return index >= 0
 enddef
