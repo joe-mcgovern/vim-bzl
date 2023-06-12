@@ -6,7 +6,7 @@ command! -nargs=0 BazelRunCurrent :call BazelActionAgainstTargetUnderCursor("run
 command! -nargs=1 BazelCurrent :call BazelActionAgainstTargetUnderCursor(<f-args>)
 nnoremap <buffer> <leader>bt :BazelTestCurrent<cr>
 nnoremap <buffer> <leader>bb :BazelBuildCurrent<cr>
-nnoremap <buffer> <leader>br :BazelBuildCurrent<cr>
+nnoremap <buffer> <leader>br :BazelRunCurrent<cr>
 
 # * TODO: Check if dispatch is installed before using it
 # * TODO: This should be robustified so that tests can be run from within a go file.
