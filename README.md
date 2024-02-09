@@ -18,7 +18,9 @@ executing bazel commands. This must be installed for this package to work proper
 Using vim's native package management:
 ```
 mkdir -p ~/.vim/pack/plugin/start
-git clone git@github.com:joe-mcgovern/vim-bzl.git ~/.vim/pack/plugin/start
+cd ~/.vim/pack/plugin/start
+git clone https://github.com/joe-mcgovern/vim-bzl.git
+vim -u NONE -c "helptags vim-bzl/doc" -c q
 ```
 
 ## Integrations
