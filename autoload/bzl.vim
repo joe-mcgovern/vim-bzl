@@ -6,6 +6,20 @@ export def ExecuteCommand(command: string, path: string, target: string)
   execute ":Start -wait=always bazel " .. command .. " //" .. cleanPath .. ":" .. target
 enddef
 
+export def ExecuteTest(path: string, target: string)
+  ExecuteCommand("test", path, target)
+enddef
+
+export def ExecuteTestWithFilter(path: string, target: string, testFilter: string)
+  ExecuteCommandWithOptions("test", path, target, "--test_filter='" .. testFilter .. "'")
+enddef
+
+export def ExecuteCommandWithOptions(command: string, path: string, target: string, args: string)
+  const pathWithoutDotPrefix = substitute(path, '^\.', '', '')
+  const cleanPath = substitute(pathWithoutDotPrefix, '^\/*', '', '')
+  execute ":Start -wait=always bazel " .. command .. " //" .. cleanPath .. ":" .. target .. " " .. args
+enddef
+
 export def BufferTestTarget(default: string): string
   return get(b:, "bzl_test_target", default)
 enddef
